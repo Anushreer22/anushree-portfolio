@@ -1,0 +1,49 @@
+services:
+  # Backend Web Service
+  - type: web
+    name: anushree-portfolio-backend
+    env: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm install && npm run build && npx prisma migrate deploy
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: anushree-portfolio-db
+          property: connectionString
+      - key: CORS_ORIGIN
+        sync: false # Set in Render Dashboard: e.g. https://your-portfolio.vercel.app
+      - key: JWT_SECRET
+        generateValue: true # Generates secure 256-bit random string
+      - key: JWT_EXPIRES_IN
+        value: 1h
+      - key: RESEND_API_KEY
+        sync: false # Set in Render Dashboard
+      - key: CONTACT_FROM_EMAIL
+        value: Portfolio Contact <onboarding@resend.dev>
+      - key: CONTACT_TO_EMAIL
+        value: anushreer695@gmail.com
+      - key: RATE_LIMIT_WINDOW_MINUTES
+        value: 15
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: 100
+      - key: RATE_LIMIT_CONTACT_MAX
+        value: 5
+      - key: RATE_LIMIT_AUTH_MAX
+        value: 5
+
+databases:
+  # Managed PostgreSQL Database
+  - name: anushree-portfolio-db
+    plan: free
+    region: oregon
+    databaseName: portfolio_db
+    user: portfolio_user
+

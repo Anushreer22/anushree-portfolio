@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MessageStatus {
+  UNREAD
+  READ
+  ARCHIVED
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  number      String?
+  title       String
+  category    String
+  description String
+  details     String[]
+  stack       String[]
+  githubUrl   String?
+  liveDemoUrl String?
+  featured    Boolean  @default(false)
+  published   Boolean  @default(true)
+  accent      String?  @default("violet")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published, featured])
+  @@index([slug])
+}
+
+model ContactMessage {
+  id         String        @id @default(cuid())
+  name       String
+  email      String
+  subject    String
+  message    String
+  status     MessageStatus @default(UNREAD)
+  ipAddress  String?
+  userAgent  String?
+  emailSent  Boolean       @default(false)
+  emailError String?
+  adminNotes String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([status, createdAt])
+  @@index([email])
+}
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String
+  passwordHash String
+  role         String    @default("ADMIN")
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([email])
+}
+
